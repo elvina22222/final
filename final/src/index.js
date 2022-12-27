@@ -1,17 +1,40 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import registerServiceWorker from './registerServiceWorker';
+import { BrowserRouter } from 'react-router-dom';
+//Redux
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+import picturesReducer from './store/reducers/pictures';
+import menuContainerReducer from './store/reducers/menuContainer';
+import learnMoreReducer from './store/reducers/learnMore';
+import thunk from 'redux-thunk';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const rootReducer = combineReducers({
+	menuContainer: menuContainerReducer,
+	pictures: picturesReducer,
+	learnMore: learnMoreReducer
+});
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+
+// from redux-thunk
+const composeEnhancers = process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose : null;
+const store = createStore(rootReducer, composeEnhancers(
+	applyMiddleware(thunk)
+	));
+
+
+const app = (
+	<Provider store={store}>
+		<BrowserRouter>
+			<App />
+		</BrowserRouter>
+	</Provider>
+	);
+
+
+
+ReactDOM.render(app, document.getElementById('root'));
+registerServiceWorker();
